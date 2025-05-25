@@ -149,7 +149,7 @@ const fetchUserData = async () => {
     user.value = response.data
   } catch (err) {
     console.error('Failed to fetch user data:', err)
-    error.value = err.response?.data?.message || 'Gagal memuat data pengguna'
+    error.value = err.response?.data?.message || 'Sesi anda telah berakhir, silakan logout lalu login kembali'
   }
 }
 
@@ -163,7 +163,7 @@ const fetchCourses = async () => {
     courses.value = response.data.data || response.data
   } catch (err) {
     console.error('Failed to fetch courses:', err)
-    error.value = err.response?.data?.message || 'Gagal memuat daftar mata kuliah'
+    error.value = err.response?.data?.message || 'Sesi anda telah berakhir, silakan logout lalu login kembali'
   }
 }
 
@@ -178,7 +178,7 @@ const fetchAssignments = async () => {
     assignments.value = response.data.data || response.data
   } catch (err) {
     console.error('Failed to fetch assignments:', err)
-    assignmentsError.value = err.response?.data?.message || 'Gagal memuat daftar tugas'
+    assignmentsError.value = err.response?.data?.message || 'Sesi anda telah berakhir, silakan logout lalu login kembali'
   } finally {
     assignmentsLoading.value = false
   }

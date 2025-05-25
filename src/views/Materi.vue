@@ -26,10 +26,26 @@
           <!-- Materi Section -->
           <div class="mb-8">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">Materi</h2>
-            <div class="prose max-w-none">
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl.</p>
-              <p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-              <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            
+            <div v-if="materialsLoading" class="text-center py-8">
+              <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black mx-auto mb-4"></div>
+              <p>Memuat daftar materi...</p>
+            </div>
+            <div v-else-if="materialsError" class="text-center text-red-500 py-4">
+              <p>{{ materialsError }}</p>
+            </div>
+            <div v-else-if="materials.length === 0" class="text-center py-4 text-gray-500">
+              <p>Tidak ada materi yang ditemukan</p>
+            </div>
+            <div v-else class="space-y-6">
+              <div 
+                v-for="material in materials" 
+                :key="material.id"
+                class="border-2 border-gray-200 rounded-lg p-6 bg-white"
+              >
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">{{ material.title }}</h3>
+                <div class="prose max-w-none text-gray-700" v-html="material.content"></div>
+              </div>
             </div>
           </div>
 
@@ -87,10 +103,13 @@ const route = useRoute()
 
 // Data state
 const course = ref({})
+const materials = ref([])
 const assignments = ref([])
 const loading = ref(true)
+const materialsLoading = ref(true)
 const assignmentsLoading = ref(true)
 const error = ref(null)
+const materialsError = ref(null)
 const assignmentsError = ref(null)
 
 // Fetch course data
@@ -104,9 +123,27 @@ const fetchCourse = async () => {
     course.value = response.data
   } catch (err) {
     console.error('Failed to fetch course data:', err)
-    error.value = err.response?.data?.message || 'Gagal memuat data mata kuliah'
+    error.value = err.response?.data?.message || 'Sesi anda telah berakhir, silakan logout lalu login kembali'
   } finally {
     loading.value = false
+  }
+}
+
+// Fetch materials for this course
+const fetchMaterials = async () => {
+  materialsLoading.value = true
+  try {
+    const response = await axios.get(`http://localhost:8000/api/courses/${route.params.course}/materials`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    materials.value = response.data.data || response.data
+  } catch (err) {
+    console.error('Failed to fetch materials:', err)
+    materialsError.value = err.response?.data?.message || 'Gagal memuat materi'
+  } finally {
+    materialsLoading.value = false
   }
 }
 
@@ -122,7 +159,7 @@ const fetchAssignments = async () => {
     assignments.value = response.data.data || response.data
   } catch (err) {
     console.error('Failed to fetch assignments:', err)
-    assignmentsError.value = err.response?.data?.message || 'Gagal memuat daftar tugas'
+    assignmentsError.value = err.response?.data?.message || 'Sesi anda telah berakhir, silakan logout lalu login kembali'
   } finally {
     assignmentsLoading.value = false
   }
@@ -136,6 +173,16 @@ const formatDate = (dateString) => {
 
 // Initial data loading
 onMounted(async () => {
-  await Promise.all([fetchCourse(), fetchAssignments()])
+  await Promise.all([fetchCourse(), fetchMaterials(), fetchAssignments()])
 })
 </script>
+
+<style scoped>
+.prose {
+  line-height: 1.6;
+}
+
+.prose p {
+  margin-bottom: 1em;
+}
+</style>

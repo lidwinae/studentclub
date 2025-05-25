@@ -42,6 +42,13 @@
             <p class="mt-2">Loading data...</p>
           </div>
 
+          <!-- Empty State -->
+          <div v-else-if="filteredAssignments.length === 0" class="text-center py-8 bg-white rounded-lg shadow">
+            <p class="text-gray-500 text-lg">
+              {{ getEmptyStateMessage() }}
+            </p>
+          </div>
+
           <!-- Assignment List -->
           <div v-else class="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
             <router-link
@@ -109,6 +116,21 @@ const filteredAssignments = computed(() => {
 function formatDate(dateStr) {
   const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }
   return new Date(dateStr).toLocaleDateString('id-ID', options)
+}
+
+function getEmptyStateMessage() {
+  if (assignments.value.length === 0) {
+    return 'Tidak ada tugas'
+  }
+  
+  switch (selectedFilter.value) {
+    case 'submitted':
+      return 'Tidak ada tugas yang sudah submit'
+    case 'not-submitted':
+      return 'Tidak ada tugas yang belum submit'
+    default:
+      return 'Tidak ada tugas'
+  }
 }
 </script>
 

@@ -35,6 +35,31 @@
             <h2 class="text-xl font-semibold text-gray-800 mb-4">
               {{ submission ? 'Pengumpulan Anda' : 'Kirim Tugas' }}
             </h2>
+            
+            <!-- Submission Status -->
+            <div v-if="submission" class="flex items-center gap-2 mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-check-circle-2"
+                :class="isSubmissionLate ? 'text-red-500' : 'text-green-500'"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+              <span :class="isSubmissionLate ? 'text-red-600' : 'text-green-600'">
+                Dikumpulkan pada {{ formatDate(submission.updated_at) }}
+                <span v-if="isSubmissionLate" class="font-semibold"> (Terlambat)</span>
+              </span>
+            </div>
+
             <!-- Submission Form -->
             <form @submit.prevent="submission ? handlePatch() : handlePost()" class="space-y-4">
               <!-- Text Answer -->
@@ -133,7 +158,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppNavbar from '@/components/Navbar.vue'
 import axios from 'axios'
@@ -154,12 +179,20 @@ const form = ref({
   file: null,
 })
 
+// Computed property untuk mengecek apakah pengumpulan terlambat
+const isSubmissionLate = computed(() => {
+  if (!submission.value || !assignment.value.due_date) return false
+  const submissionDate = new Date(submission.value.updated_at)
+  const deadline = new Date(assignment.value.due_date)
+  return submissionDate > deadline
+})
+
 // Fetch data
 const fetchData = async () => {
   try {
     loading.value = true
     const [assignmentRes, courseRes] = await Promise.all([
-      axios.get(`http://localhost:8000/api/assignments/${route.params.assignment}`, {
+      axios.get(`http://localhost:8000/api/courses/${route.params.course}/assignments/${route.params.assignment}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       }),
       axios.get(`http://localhost:8000/api/courses/${route.params.course}`, {
@@ -186,7 +219,7 @@ const fetchData = async () => {
     }
   } catch (err) {
     console.error('Failed to fetch data:', err)
-    error.value = err.response?.data?.message || 'Gagal memuat data tugas'
+    error.value = err.response?.data?.message || 'Sesi anda telah berakhir, silakan logout lalu login kembali'
   } finally {
     loading.value = false
   }
@@ -247,13 +280,10 @@ const handlePost = async () => {
 const handlePatch = async () => {
   try {
     isUploading.value = true;
-
-    // 1. Handle file upload ke penyimpanan lain (bagian supabase dihapus)
     let fileUrl = submission.value?.file_url || '';
     if (form.value.file) {
       try {
-        // Simulasikan bahwa fileUrl baru dihasilkan setelah upload
-        fileUrl = 'URL_FILE_SETELAH_UPLOAD'; // Ganti sesuai hasil upload Anda
+        fileUrl = 'URL_FILE_SETELAH_UPLOAD';
 
       } catch (uploadErr) {
         console.error('Upload error:', uploadErr);
@@ -261,14 +291,12 @@ const handlePatch = async () => {
       }
     }
 
-    // 2. Persiapkan payload untuk PATCH request
     const payload = {
       answer: form.value.answer || '',
       ...(fileUrl ? { file_url: fileUrl } : {}),
       ...(!form.value.file && submission.value?.file_url ? { is_file_deleted: true } : {})
     };
 
-    // 3. Kirim request ke backend
     const url = `http://localhost:8000/api/courses/${route.params.course}/assignments/${route.params.assignment}/submissions`;
     const response = await axios.patch(url, payload, {
       headers: {
@@ -277,7 +305,7 @@ const handlePatch = async () => {
       }
     });
 
-    // 4. Update state
+    // update state
     submission.value = response.data;
     isEditing.value = false;
     form.value.file = null;
