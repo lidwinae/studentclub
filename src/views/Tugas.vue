@@ -278,21 +278,10 @@ const handlePost = async () => {
 const handlePatch = async () => {
   try {
     isUploading.value = true;
-    let fileUrl = submission.value?.file_url || '';
-    if (form.value.file) {
-      try {
-        fileUrl = 'URL_FILE_SETELAH_UPLOAD';
-
-      } catch (uploadErr) {
-        console.error('Upload error:', uploadErr);
-        throw new Error(`Gagal mengunggah file: ${uploadErr.message}`);
-      }
-    }
-
+    
+    // Hanya kirim answer saja, tidak termasuk file_url atau is_file_deleted
     const payload = {
-      answer: form.value.answer || '',
-      ...(fileUrl ? { file_url: fileUrl } : {}),
-      ...(!form.value.file && submission.value?.file_url ? { is_file_deleted: true } : {})
+      answer: form.value.answer || ''
     };
 
     const url = `http://localhost:8000/api/courses/${route.params.course}/assignments/${route.params.assignment}/submissions`;
@@ -307,9 +296,8 @@ const handlePatch = async () => {
     submission.value = response.data;
     isEditing.value = false;
     form.value.file = null;
-    form.value.file_url = response.data.file_url || '';
 
-    alert('Pengumpulan berhasil diupdate!');
+    alert('Jawaban berhasil diupdate!');
     await fetchData();
   } catch (err) {
     console.error('Patch error:', {
@@ -317,10 +305,8 @@ const handlePatch = async () => {
       response: err.response?.data
     });
 
-    let errorMessage = 'Gagal mengupdate pengumpulan';
-    if (err.message.includes('Gagal mengunggah file')) {
-      errorMessage = err.message;
-    } else if (err.response?.data?.message) {
+    let errorMessage = 'Gagal mengupdate jawaban';
+    if (err.response?.data?.message) {
       errorMessage = err.response.data.message;
     } else if (err.response?.data?.errors) {
       errorMessage = Object.values(err.response.data.errors).flat().join(', ');
