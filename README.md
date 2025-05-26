@@ -19,4 +19,4 @@
 
 ---
 
-![alt text](https://github.com/lidwinae/studentclub/blob/main/public/screenshot.png?raw=true)
+![alt text](https://github.com/lidwinae/studentclub/blob/main/public/screenshots.png?raw=true)
