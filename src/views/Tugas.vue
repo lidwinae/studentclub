@@ -97,7 +97,7 @@
                 <p v-if="form.file" class="mt-2 text-sm text-gray-600">
                   File baru: {{ form.file.name }}
                 </p>
-                <p v-else-if="submission?.file_url" class="mt-2 text-sm text-gray-600">
+                <p v-else-if="submission?.file_url" class="mt-2 text-sm text-gray-600 break-words">
                   File terkumpul: {{ submission.file_url }}
                 </p>
               </div>
@@ -200,11 +200,11 @@ const fetchData = async () => {
       axios.get(`http://localhost:8000/api/courses/${route.params.course}/assignments/${route.params.assignment}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       }),
-      coursesService.getCourseDetail(route.params.course) // Menggunakan service
+      coursesService.getCourseDetail(route.params.course)
     ])
 
     assignment.value = assignmentRes.data
-    course.value = courseRes // Tidak perlu .data karena sudah dihandle di service
+    course.value = courseRes
 
     if (assignment.value.has_submit) {
       try {
