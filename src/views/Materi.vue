@@ -98,6 +98,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import AppNavbar from '@/components/Navbar.vue'
 import axios from 'axios'
+import coursesService from '@/services/courses'
 
 const route = useRoute()
 
@@ -115,15 +116,10 @@ const assignmentsError = ref(null)
 // Fetch course data
 const fetchCourse = async () => {
   try {
-    const response = await axios.get(`http://localhost:8000/api/courses/${route.params.course}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    course.value = response.data
+    course.value = await coursesService.getCourseDetail(route.params.course)
   } catch (err) {
     console.error('Failed to fetch course data:', err)
-    error.value = err.response?.data?.message || 'Sesi anda telah berakhir, silakan logout lalu login kembali'
+    error.value = err.response?.data?.message || err.message || 'Sesi anda telah berakhir, silakan logout lalu login kembali'
   } finally {
     loading.value = false
   }

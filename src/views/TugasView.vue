@@ -79,7 +79,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import axios from 'axios'
+import coursesService from '@/services/courses'
 import AppNavbar from '@/components/Navbar.vue'
 
 const route = useRoute()
@@ -89,14 +89,7 @@ const loading = ref(true)
 
 onMounted(async () => {
   try {
-    // Fetch assignments dengan data course yang sudah termasuk
-    const assignmentsResponse = await axios.get('http://localhost:8000/api/users/_self/assignments?include=course', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    assignments.value = assignmentsResponse.data.data
-
+    assignments.value = await coursesService.getUserAssignmentsWithCourses()
   } catch (error) {
     console.error('Gagal fetch data:', error)
   } finally {

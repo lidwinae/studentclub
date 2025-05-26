@@ -166,6 +166,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppNavbar from '@/components/Navbar.vue'
 import axios from 'axios'
+import coursesService from '@/services/courses'
 
 const route = useRoute()
 const router = useRouter()
@@ -199,13 +200,11 @@ const fetchData = async () => {
       axios.get(`http://localhost:8000/api/courses/${route.params.course}/assignments/${route.params.assignment}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       }),
-      axios.get(`http://localhost:8000/api/courses/${route.params.course}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      })
+      coursesService.getCourseDetail(route.params.course) // Menggunakan service
     ])
 
     assignment.value = assignmentRes.data
-    course.value = courseRes.data
+    course.value = courseRes // Tidak perlu .data karena sudah dihandle di service
 
     if (assignment.value.has_submit) {
       try {
