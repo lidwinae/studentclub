@@ -118,7 +118,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { ArrowRight, BookA, Bookmark, Notebook } from 'lucide-vue-next'
 import AppNavbar from '@/components/Navbar.vue'
-import axios from 'axios'
+import dashboardService from '@/services/dashboard' 
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -139,28 +139,9 @@ const getIconForCourse = (course) => {
   return stableIcons[index]
 }
 
-const fetchUserData = async () => {
-  try {
-    const response = await axios.get('http://localhost:8000/api/users/_self', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    user.value = response.data
-  } catch (err) {
-    console.error('Failed to fetch user data:', err)
-    error.value = err.response?.data?.message || 'Sesi anda telah berakhir, silakan logout lalu login kembali'
-  }
-}
-
 const fetchCourses = async () => {
   try {
-    const response = await axios.get('http://localhost:8000/api/users/_self/courses', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    courses.value = response.data.data || response.data
+    courses.value = await dashboardService.getMyCourses()
   } catch (err) {
     console.error('Failed to fetch courses:', err)
     error.value = err.response?.data?.message || 'Sesi anda telah berakhir, silakan logout lalu login kembali'
@@ -170,12 +151,7 @@ const fetchCourses = async () => {
 const fetchAssignments = async () => {
   assignmentsLoading.value = true
   try {
-    const response = await axios.get('http://localhost:8000/api/users/_self/assignments', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    assignments.value = response.data.data || response.data
+    assignments.value = await dashboardService.getMyAssignments()
   } catch (err) {
     console.error('Failed to fetch assignments:', err)
     assignmentsError.value = err.response?.data?.message || 'Sesi anda telah berakhir, silakan logout lalu login kembali'
@@ -206,7 +182,7 @@ const formatDate = (dateString) => {
 
 onMounted(async () => {
   try {
-    await Promise.all([fetchUserData(), fetchCourses(), fetchAssignments()])
+    await Promise.all([fetchCourses(), fetchAssignments()])
   } catch (err) {
     console.error('Initialization error:', err)
   } finally {

@@ -80,7 +80,7 @@
 import { ref, onMounted } from 'vue'
 import { ArrowLeft, Check, Plus, Trash2 } from 'lucide-vue-next'
 import AppNavbar from '@/components/Navbar.vue'
-import axios from 'axios'
+import coursesService from '@/services/courses'
 
 const courses = ref([])
 const loading = ref(true)
@@ -88,12 +88,7 @@ const error = ref(null)
 
 onMounted(async () => {
   try {
-    const res = await axios.get('http://localhost:8000/api/courses', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    courses.value = res.data.data || res.data
+    courses.value = await coursesService.getAllCourses()
   } catch (err) {
     console.error('Gagal ambil daftar semua course:', err)
     error.value = 'Gagal memuat data mata kuliah'
@@ -104,11 +99,7 @@ onMounted(async () => {
 
 const handleEnroll = async (id) => {
   try {
-    await axios.post(`http://localhost:8000/api/courses/${id}`, {}, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
+    await coursesService.enrollCourse(id)
     alert('Berhasil ambil mata kuliah!')
     const course = courses.value.find(c => c.id === id)
     if (course) course.has_enroll = true
@@ -123,11 +114,7 @@ const handleUnenroll = async (id, name) => {
   if (!confirmed) return
 
   try {
-    await axios.delete(`http://localhost:8000/api/courses/${id}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    })
+    await coursesService.unenrollCourse(id)
     alert('Berhasil membatalkan mata kuliah!')
     const course = courses.value.find(c => c.id === id)
     if (course) course.has_enroll = false
