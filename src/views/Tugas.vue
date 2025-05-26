@@ -20,7 +20,11 @@
             <div class="space-y-1 text-gray-600">
               <p>Mata Kuliah: {{ course.name }}</p>
               <p>Deadline: {{ formatDate(assignment.due_date) }}</p>
-              <p v-if="submission && submission.grade !== null && submission.grade !== undefined">Nilai: {{ submission.grade }}</p>
+              <p v-if="submission && submission.grade !== null && submission.grade !== undefined" class="font-medium text-gray-800 mb-2">Nilai: {{ submission.grade }}</p>
+              <div v-if="submission && submission.feedback !== null && submission.feedback !== undefined" class="mt-4 p-4 bg-gray-100 rounded-lg">
+                <p class="font-medium text-gray-800 mb-2">Feedback:</p>
+                <p class="text-gray-600 whitespace-pre-wrap">{{ submission.feedback }}</p>
+              </div>
             </div>
           </div>
           <!-- Assignment Description -->
