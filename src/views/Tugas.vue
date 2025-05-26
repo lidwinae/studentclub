@@ -59,7 +59,7 @@
                 <path d="m9 12 2 2 4-4" />
               </svg>
               <span :class="isSubmissionLate ? 'text-red-600' : 'text-green-600'">
-                Dikumpulkan pada {{ formatDate(submission.updated_at) }}
+                Dikumpulkan pada {{ formatDate(submission.created_at) }}
                 <span v-if="isSubmissionLate" class="font-semibold"> (Terlambat)</span>
               </span>
             </div>
@@ -149,11 +149,6 @@
                 </template>
               </div>
             </form>
-            <!-- Feedback Section -->
-            <div v-if="submission?.feedback" class="mt-8 p-4 bg-gray-50 rounded-lg">
-              <h3 class="text-lg font-medium text-gray-800 mb-2">Feedback</h3>
-              <p class="text-gray-600">{{ submission.feedback }}</p>
-            </div>
           </div>
         </div>
       </div>
@@ -187,7 +182,7 @@ const form = ref({
 // Computed property untuk mengecek apakah pengumpulan terlambat
 const isSubmissionLate = computed(() => {
   if (!submission.value || !assignment.value.due_date) return false
-  const submissionDate = new Date(submission.value.updated_at)
+  const submissionDate = new Date(submission.value.created_at)
   const deadline = new Date(assignment.value.due_date)
   return submissionDate > deadline
 })

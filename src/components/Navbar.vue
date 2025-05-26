@@ -72,39 +72,39 @@
         <template v-if="isAuthenticated">
           <router-link 
             to="/dashboard" 
-            class="px-4 py-3 hover:bg-gray-800 rounded transition-all"
+            class="px-4 py-3 hover:bg-gray-700 rounded transition-all"
             @click="mobileMenuOpen = false"
-            active-class="text-gray-300 font-medium"
+            active-class="bg-gray-800 font-medium"
           >
             Dashboard
           </router-link>
           <router-link 
             to="/daftarmatakuliah" 
-            class="px-4 py-3 hover:bg-gray-800 rounded transition-all"
+            class="px-4 py-3 hover:bg-gray-700 rounded transition-all"
             @click="mobileMenuOpen = false"
-            active-class="text-gray-300 font-medium"
+            active-class="bg-gray-800 font-medium"
           >
             Daftar Mata Kuliah
           </router-link>
           <router-link 
             to="/tugas" 
-            class="px-4 py-3 hover:bg-gray-800 rounded transition-all"
+            class="px-4 py-3 hover:bg-gray-700 rounded transition-all"
             @click="mobileMenuOpen = false"
-            active-class="text-gray-300 font-medium"
+            active-class="bg-gray-800 font-medium"
           >
             List Tugas
           </router-link>
           <router-link 
             to="/profile" 
-            class="px-4 py-3 hover:bg-gray-800 rounded transition-all"
+            class="px-4 py-3 hover:bg-gray-700 rounded transition-all"
             @click="mobileMenuOpen = false"
-            active-class="text-gray-300 font-medium"
+            active-class="bg-gray-800 font-medium"
           >
             Profile
           </router-link>
           <button 
             @click="handleLogout" 
-            class="px-4 py-3 text-left hover:bg-gray-800 rounded transition-all"
+            class="px-4 py-3 text-left hover:bg-gray-700 rounded transition-all"
           >
             Logout
           </button>
@@ -112,9 +112,9 @@
         <template v-else>
           <router-link 
             to="/login" 
-            class="px-4 py-3 hover:bg-gray-800 rounded transition-all"
+            class="px-4 py-3 hover:bg-gray-700 rounded transition-all"
             @click="mobileMenuOpen = false"
-            active-class="text-gray-300 font-medium"
+            active-class="bg-gray-800 font-medium"
           >
             Login
           </router-link>
